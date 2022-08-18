@@ -57,6 +57,9 @@ class CdkMlPipelineStack(Stack):
                 aws_iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole")
             ])
 
+        inference_results_bucket.grant_read_write(inference_lambda_execution_role)
+        inference_lambda_execution_role.add_to_policy(model_artifacts_bucket_read_only_statement)
+
 # Inference Lambda image ECR
         inference_ecr= ecr.Repository(self, "inference-ecr", repository_name="inference-ecr")
 
@@ -135,7 +138,7 @@ class CdkMlPipelineStack(Stack):
             statements=[
                 aws_iam.PolicyStatement(
                     actions=["lambda:GetFunction", "lambda:CreateFunction","lambda:UpdateFunctionCode"],
-                    resources=["arn:aws:lambda:"+cdk.Aws.REGION+":"+cdk.Aws.ACCOUNT_ID+":function:training-lambda"]
+                    resources=["arn:aws:lambda:"+cdk.Aws.REGION+":"+cdk.Aws.ACCOUNT_ID+":function:inference-lambda"]
                 ),
                 aws_iam.PolicyStatement(
                     actions=["iam:GetRole", "iam:PassRole"],

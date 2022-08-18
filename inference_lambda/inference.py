@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 import boto3
@@ -34,7 +35,7 @@ def handler(event, context):
     prediction=model.predict(test_X)
     print('The accuracy of the KNN is',metrics.accuracy_score(prediction,test_y))
 
-    prediction_csv = pd.DataFrame(predictions, columns=['predictions']).to_csv('/tmp/prediction.csv')
+    prediction_csv = pd.DataFrame(prediction, columns=['prediction']).to_csv('/tmp/prediction.csv')
 
     t = datetime.datetime.now()
     path="inference-results/"+t.strftime('%m-%d-%Y %H-%M-%S')+"/prediction.csv"
