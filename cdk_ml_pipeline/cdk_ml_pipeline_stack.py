@@ -159,3 +159,22 @@ class CdkMlPipelineStack(Stack):
                 )
             ]
         ))
+
+# Grant CodeBuild Helper Lambda permissions for StartBuild and BatchGet* actions for codebuild resources
+        codebuild_helper_statement=aws_iam.PolicyStatement(
+            actions=["codebuild:StartBuild","codebuild:BatchGet*"],
+            resources=["*"]
+        )
+
+# CodeBuild Helper Lambda to call CodeBuild projects in Step Functions
+        codebuild_helper_lambda = aws_lambda.Function(
+            self, "codebuild-helper-function",
+            function_name="codebuild-helper-function",
+            runtime=aws_lambda.Runtime.PYTHON_3_9,
+            handler="codebuild_helper_lambda.handler",
+            code=aws_lambda.Code.from_asset("./lambdas"),
+            timeout=cdk.Duration.minutes(10)
+        )
+
+# Attach CodeBuild policy to CodeBuild Helper Lambda execution role
+        codebuild_helper_lambda.role.add_to_policy(codebuild_helper_statement)
