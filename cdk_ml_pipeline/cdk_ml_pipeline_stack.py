@@ -180,6 +180,11 @@ class CdkMlPipelineStack(Stack):
         codebuild_helper_lambda.role.add_to_policy(codebuild_helper_statement)
 
 # Step function to tie CodeBuild steps together to retrain
+        train_task = tasks.LambdaInvoke(self, "train",
+            lambda_function=training_lambda,
+            result_path = sfn.JsonPath.string_at("$.result")
+        )
+
         inference_image_update_task= tasks.LambdaInvoke(self, "inference-image-update",
             lambda_function=codebuild_helper_lambda,
             payload=sfn.TaskInput.from_object({
@@ -196,7 +201,10 @@ class CdkMlPipelineStack(Stack):
             result_path = sfn.JsonPath.string_at("$.result")
         )
 
-        retrain_definition = inference_image_update_task.next(create_or_update_inference_lambda_task)
+        train_task.next(inference_image_update_task)
+        inference_image_update_task.next(create_or_update_inference_lambda_task)
+
+        retrain_definition = train_task
 
         retrain_sfn = sfn.StateMachine(self, "retrain_sfn",
             definition=retrain_definition,
