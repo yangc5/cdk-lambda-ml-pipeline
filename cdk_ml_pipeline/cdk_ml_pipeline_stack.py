@@ -45,7 +45,7 @@ class CdkMlPipelineStack(Stack):
         training_lambda.role.add_to_policy(model_artifacts_bucket_read_write_statement)
 
 # S3 bucket for inference results during inferencing process
-        inference_results_bucket = aws_s3.Bucket(self, "inference-results-bucket", bucket_name="cdk-ml-pipeline-iris-model-inference-results-bucket",versioned=True)
+        inference_results_bucket = aws_s3.Bucket(self, "inference-results-bucket", bucket_name=cdk.Aws.ACCOUNT_ID+"-cdk-ml-pipeline-iris-model-inference-results-bucket",versioned=True)
 
 # Inference Lambda execution role
         inference_lambda_execution_role = aws_iam.Role(self,
@@ -61,10 +61,10 @@ class CdkMlPipelineStack(Stack):
         inference_lambda_execution_role.add_to_policy(model_artifacts_bucket_read_only_statement)
 
 # Inference Lambda image ECR
-        inference_ecr= ecr.Repository(self, "inference-ecr", repository_name="inference-ecr")
+        inference_ecr= ecr.Repository(self, "inference-ecr", repository_name=cdk.Aws.ACCOUNT_ID+"-cdk-ml-pipeline-inference-ecr")
 
 # S3 bucket for CodeBuild artifacts including buildspec.yml
-        codebuild_artifacts_bucket = aws_s3.Bucket(self, "codebuild-bucket", bucket_name="cdk-ml-pipeline-codebuild-artifacts-bucket",versioned=True)
+        codebuild_artifacts_bucket = aws_s3.Bucket(self, "codebuild-bucket", bucket_name=cdk.Aws.ACCOUNT_ID+"-cdk-ml-pipeline-codebuild-artifacts-bucket",versioned=True)
 
 # inference_image_codebuild project
         inference_image_codebuild_bucket_deployment = s3deploy.BucketDeployment(self, "inference-image-codebuild-artifacts-bucket-deployment",
