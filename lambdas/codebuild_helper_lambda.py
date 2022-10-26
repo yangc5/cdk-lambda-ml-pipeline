@@ -34,6 +34,10 @@ def handler(event, context):
         if build_status == 'IN_PROGRESS':
             time.sleep(5)
         elif build_status == 'SUCCEEDED':
-            return project_name + " succeeded."
+            is_running = False
+            doreturn = True
         else:
-            raise
+            raise Exception("codebuild project" + response['builds'][0] + "did not succeed")
+    
+    if doreturn:
+        return project_name + " for "+ site_id + " succeeded."
